@@ -1,0 +1,151 @@
+# ========================================
+# PYTHON
+# ========================================
+*.py[cod]
+*.pyo
+*.pyd
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+eggs/
+parts/
+var/
+sdist/
+develop-eggs/
+.installed.cfg
+lib64/
+pip-log.txt
+pip-delete-this-directory.txt
+htmlcov/
+.tox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.log
+.git/
+.mypy_cache/
+.pytest_cache/
+.hypothesis/
+.dmypy.json
+dmypy.json
+*.prof
+.pyre/
+
+# ========================================
+# DJANGO
+# ========================================
+*.log
+*.pot
+*.pyc
+__pycache__/
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
+media/
+staticfiles/
+static/
+*.sqlite3
+
+# ========================================
+# ENVIRONNEMENT VIRTUEL
+# ========================================
+venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+pythonenv*
+.venv
+virtualenv/
+.virtualenv/
+
+# ========================================
+# VARIABLES D'ENVIRONNEMENT (SÉCURISÉES)
+# ========================================
+.env
+.env.local
+.env.production
+.env.development
+.env.*.local
+*.env
+*.env.*
+!example.env
+
+# ========================================
+# FICHIERS DE PROJET / IDE
+# ========================================
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+*.iml
+.idea/
+*.code-workspace
+.vscode/
+.settings/
+.project
+.classpath
+
+# ========================================
+# LOGS ET BASE DE DONNÉES
+# ========================================
+*.log
+logs/
+*.pid
+*.seed
+*.pid.lock
+db.sqlite3
+*.db
+*.mdb
+*.accdb
+
+# ========================================
+# FICHIERS DE PACKAGING
+# ========================================
+*.whl
+*.tar.gz
+*.zip
+*.rar
+*.7z
+
+# ========================================
+# FICHIERS DE TEST
+# ========================================
+*.test
+*.unittest
+.tox
+.pytest_cache/
+htmlcov/
+.coverage
+.coverage.*
+coverage.xml
+*.cover
+
+# ========================================
+# FICHIERS DE DÉPLOIEMENT
+# ========================================
+*.pem
+*.key
+*.crt
+*.p12
+*.pfx
+*.jks
+*.truststore
+*.keystore
+.terraform/
+*.tfstate
+*.tfstate.*
+.terraform.lock.hcl

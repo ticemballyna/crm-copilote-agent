@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Résultat - Copilote CRM</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 30px;
+            background: #f9f9f9;
+        }
+        h1 {
+            color: #007bff;
+            text-align: center;
+        }
+        .card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            border-left: 4px solid #007bff;
+        }
+        .card h3 {
+            margin-top: 0;
+            color: #007bff;
+        }
+        .status-auto {
+            background: #28a745;
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+            text-align: center;
+            font-weight: bold;
+        }
+        .status-manual {
+            background: #ffc107;
+            color: #333;
+            padding: 10px;
+            border-radius: 5px;
+            text-align: center;
+            font-weight: bold;
+        }
+        .label {
+            font-weight: bold;
+            color: #555;
+        }
+        .confiance-haute { color: #28a745; font-weight: bold; }
+        .confiance-moyenne { color: #ffc107; font-weight: bold; }
+        .confiance-basse { color: #dc3545; font-weight: bold; }
+        .btn-retour {
+            display: block;
+            text-align: center;
+            margin-top: 20px;
+            padding: 10px;
+            background: #007bff;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+        .btn-retour:hover {
+            background: #0056b3;
+        }
+        .section {
+            margin: 10px 0;
+            padding: 10px;
+            background: #f5f5f5;
+            border-radius: 5px;
+        }
+        .action-required {
+            background: #fff3cd;
+            border: 2px solid #ffc107;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <h1>📊 Résultat de l'analyse</h1>
+    
+    <div class="card">
+        <h3>📌 Classification</h3>
+        <p><span class="label">Catégorie :</span> {{ result.classification.categorie }}</p>
+        <p><span class="label">Sentiment :</span> {{ result.classification.sentiment }}</p>
+        <p><span class="label">Urgence :</span> {{ result.classification.urgence }}</p>
+        <p><span class="label">Justification :</span> {{ result.classification.justification_urgence }}</p>
+    </div>
+    
+    <div class="card">
+        <h3>📍 Routage recommandé</h3>
+        <p><span class="label">Département :</span> {{ result.routage.departement_recommande }}</p>
+        <p><span class="label">Agent :</span> {{ result.routage.agent_recommande|default:"Automatique" }}</p>
+        <p><span class="label">Raison :</span> {{ result.routage.raison }}</p>
+    </div>
+    
+    <div class="card">
+        <h3>👤 Résumé client</h3>
+        <div class="section">{{ result.resume_client }}</div>
+    </div>
+    
+    <div class="card" style="border-left-color: #28a745;">
+        <h3>💬 Réponse proposée</h3>
+        <div class="section">{{ result.reponse_proposee }}</div>
+    </div>
+    
+    <div class="card" style="border-left-color: #6f42c1;">
+        <h3>⚡ Action recommandée</h3>
+        <p><span class="label">Action :</span> {{ result.action_recommandee.action_recommandee }}</p>
+        <p><span class="label">Paramètres :</span> {{ result.action_recommandee.parametres }}</p>
+        <p>
+            <span class="label">Confiance :</span>
+            <span class="confiance-{{ result.action_recommandee.confiance|lower }}">
+                {{ result.action_recommandee.confiance }}
+            </span>
+        </p>
+        <p><span class="label">Validation humaine :</span> {% if result.action_recommandee.necessite_validation %}✅ Oui{% else %}❌ Non{% endif %}</p>
+    </div>
+    
+    <div class="card">
+        <h3>🔍 Statut HITL</h3>
+        {% if result.hitl_status == 'À VALIDER MANUELLEMENT' %}
+            <div class="status-manual">⚠️ {{ result.hitl_status }}</div>
+            <div class="action-required" style="margin-top: 10px;">
+                <strong>🚨 ACTION REQUISE :</strong> Le score de confiance est bas. 
+                Un agent humain doit valider la recommandation avant toute action.
+            </div>
+        {% else %}
+            <div class="status-auto">✅ {{ result.hitl_status }}</div>
+        {% endif %}
+    </div>
+    
+    <a href="{% url 'recommendation-form' %}" class="btn-retour">← Nouvelle analyse</a>
+</body>
+</html>
