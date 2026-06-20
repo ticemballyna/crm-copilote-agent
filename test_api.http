@@ -1,0 +1,312 @@
+### ============================================
+### 1. HEALTH & STATUT
+### ============================================
+
+### 1.1 Health check
+GET http://localhost:8000/api/health
+Content-Type: application/json
+
+### 1.2 Root (informations service)
+GET http://localhost:8000/
+Content-Type: application/json
+
+### 1.3 Liste des outils disponibles
+GET http://localhost:8000/api/tools
+Content-Type: application/json
+
+
+### ============================================
+### 2. DATASET (Génération de données)
+### ============================================
+
+### 2.1 Générer un dataset en mémoire (sans BDD)
+GET http://localhost:8000/api/dataset?clients=3&tickets=5&interactions=3
+Content-Type: application/json
+
+### 2.2 Générer et insérer en base (SEED)
+POST http://localhost:8000/api/dataset/seed
+Content-Type: application/json
+
+{
+  "clients": 5,
+  "tickets": 10,
+  "interactions": 5
+}
+
+### 2.3 Générer un gros dataset
+POST http://localhost:8000/api/dataset/seed
+Content-Type: application/json
+
+{
+  "clients": 15,
+  "tickets": 30,
+  "interactions": 20
+}
+
+
+### ============================================
+### 3. DONNÉES CRM (Lecture)
+### ============================================
+
+### 3.1 Liste paginée des clients
+GET http://localhost:8000/api/clients?page=1&limit=10
+Content-Type: application/json
+
+### 3.2 Liste des clients Premium
+GET http://localhost:8000/api/clients?segment=Premium
+Content-Type: application/json
+
+### 3.3 Fiche client complète (vision 360°)
+GET http://localhost:8000/api/clients/1
+Content-Type: application/json
+
+### 3.4 Liste des tickets (dashboard agent)
+GET http://localhost:8000/api/tickets?statut=Ouvert&limit=10
+Content-Type: application/json
+
+### 3.5 Tickets urgents
+GET http://localhost:8000/api/tickets?urgence=Critique&statut=Ouvert
+Content-Type: application/json
+
+### 3.6 Tickets d'un client spécifique
+GET http://localhost:8000/api/tickets?clientId=1&limit=5
+Content-Type: application/json
+
+### 3.7 Détail d'un ticket
+GET http://localhost:8000/api/tickets/1
+Content-Type: application/json
+
+
+### ============================================
+### 4. ANALYSE IA (Pipeline complet)
+### ============================================
+
+### 4.1 Analyser un ticket - Facturation
+POST http://localhost:8000/api/analyze
+Content-Type: application/json
+
+{
+  "id": 1,
+  "description": "Bonjour, je constate un double prélèvement de 29.99€ sur ma carte bancaire pour le service Premium. Pouvez-vous procéder au remboursement ?",
+  "client": {
+    "id": 1,
+    "nom": "Dupont",
+    "prenom": "Marie",
+    "email": "marie.dupont@email.com",
+    "segment": "Premium"
+  },
+  "priorite": "Haute"
+}
+
+### 4.2 Analyser un ticket - Support Technique
+POST http://localhost:8000/api/analyze
+Content-Type: application/json
+
+{
+  "id": 2,
+  "description": "Bonjour, depuis la mise à jour de l'application sur mon iPhone, celle-ci plante systématiquement à l'ouverture. J'ai essayé de réinstaller mais rien n'y fait.",
+  "client": {
+    "id": 2,
+    "nom": "Martin",
+    "prenom": "Jean",
+    "email": "jean.martin@email.com",
+    "segment": "Standard"
+  },
+  "priorite": "Moyenne"
+}
+
+### 4.3 Analyser un ticket - Réclamation
+POST http://localhost:8000/api/analyze
+Content-Type: application/json
+
+{
+  "id": 3,
+  "description": "Bonjour, le produit reçu ne correspond pas à ma commande. J'ai commandé un Pack Pro mais j'ai reçu un Pack Essentiel. Merci de corriger cette erreur.",
+  "client": {
+    "id": 3,
+    "nom": "Bernard",
+    "prenom": "Sophie",
+    "email": "sophie.bernard@email.com",
+    "segment": "Entreprise"
+  },
+  "priorite": "Haute"
+}
+
+### 4.4 Analyser un ticket - Information
+POST http://localhost:8000/api/analyze
+Content-Type: application/json
+
+{
+  "id": 4,
+  "description": "Bonjour, je souhaiterais des informations sur les nouvelles fonctionnalités de la version Pro. Pourriez-vous me contacter pour une démo ?",
+  "client": {
+    "id": 4,
+    "nom": "Petit",
+    "prenom": "Thomas",
+    "email": "thomas.petit@email.com",
+    "segment": "Standard"
+  },
+  "priorite": "Basse"
+}
+
+### 4.5 Analyser un ticket AVEC historique client
+POST http://localhost:8000/api/analyze
+Content-Type: application/json
+
+{
+  "id": 5,
+  "description": "Bonjour, je rencontre à nouveau un problème de facturation. Le double prélèvement du mois dernier n'a toujours pas été remboursé.",
+  "client": {
+    "id": 1,
+    "nom": "Dupont",
+    "prenom": "Marie",
+    "email": "marie.dupont@email.com",
+    "segment": "Premium"
+  },
+  "priorite": "Haute",
+  "historiqueTickets": [
+    {
+      "id": 101,
+      "categorie": "Facturation",
+      "description": "Double prélèvement de 29.99€ - En attente de remboursement"
+    },
+    {
+      "id": 102,
+      "categorie": "Support Technique",
+      "description": "Problème de connexion résolu"
+    }
+  ],
+  "interactionsRecentes": [
+    {
+      "canal": "Email",
+      "date": "2026-06-15",
+      "resume": "Client a contacté pour un double prélèvement"
+    },
+    {
+      "canal": "Téléphone",
+      "date": "2026-06-10",
+      "resume": "Appel concernant une facture impayée"
+    }
+  ]
+}
+
+### 4.6 Analyser un ticket sans ID (mode test rapide)
+POST http://localhost:8000/api/analyze
+Content-Type: application/json
+
+{
+  "id": 0,
+  "description": "Bonjour, je n'arrive pas à me connecter à mon compte. J'ai oublié mon mot de passe.",
+  "client": {
+    "id": 0,
+    "nom": "Test",
+    "prenom": "Client",
+    "email": "test@email.com",
+    "segment": "Standard"
+  },
+  "priorite": "Moyenne"
+}
+
+
+### ============================================
+### 5. CHATBOT (Mode conversationnel)
+### ============================================
+
+### 5.1 Chat avec client existant
+POST http://localhost:8000/api/chat
+Content-Type: application/json
+
+{
+  "message": "Bonjour, je constate un double prélèvement sur ma carte. Comment faire pour me faire rembourser ?",
+  "clientId": 1
+}
+
+### 5.2 Chat sans client (anonyme)
+POST http://localhost:8000/api/chat
+Content-Type: application/json
+
+{
+  "message": "Mon application ne fonctionne plus après la mise à jour. Aidez-moi s'il vous plaît !"
+}
+
+### 5.3 Chat avec message technique
+POST http://localhost:8000/api/chat
+Content-Type: application/json
+
+{
+  "message": "J'ai un problème avec l'API, les requêtes retournent une erreur 500. Pouvez-vous m'aider ?",
+  "clientId": 2
+}
+
+
+### ============================================
+### 6. VALIDATION HUMAINE (HITL)
+### ============================================
+
+### 6.1 Valider une analyse
+PATCH http://localhost:8000/api/tickets/1/validation
+Content-Type: application/json
+
+{
+  "statutValidation": "Valide"
+}
+
+### 6.2 Modifier la réponse proposée avant validation
+PATCH http://localhost:8000/api/tickets/1/validation
+Content-Type: application/json
+
+{
+  "statutValidation": "Modifie",
+  "reponseProposee": "Bonjour Madame Dupont, suite à votre demande de remboursement, nous avons bien pris en compte votre réclamation. Un remboursement de 29.99€ va être effectué sous 48h. Nous vous remercions de votre confiance."
+}
+
+### 6.3 Rejeter une analyse
+PATCH http://localhost:8000/api/tickets/1/validation
+Content-Type: application/json
+
+{
+  "statutValidation": "Rejete"
+}
+
+### 6.4 Validation sur ticket non analysé (doit échouer)
+PATCH http://localhost:8000/api/tickets/999/validation
+Content-Type: application/json
+
+{
+  "statutValidation": "Valide"
+}
+
+
+### ============================================
+### 7. ERREURS & CAS LIMITES
+### ============================================
+
+### 7.1 Ticket inexistant
+GET http://localhost:8000/api/tickets/99999
+Content-Type: application/json
+
+### 7.2 Client inexistant
+GET http://localhost:8000/api/clients/99999
+Content-Type: application/json
+
+### 7.3 Analyse avec description vide (doit échouer)
+POST http://localhost:8000/api/analyze
+Content-Type: application/json
+
+{
+  "description": "",
+  "client": {
+    "id": 1,
+    "nom": "Dupont",
+    "prenom": "Marie",
+    "email": "marie.dupont@email.com"
+  }
+}
+
+### 7.4 Requête mal formée (doit échouer)
+POST http://localhost:8000/api/analyze
+Content-Type: application/json
+
+{
+  "client": {}
+}

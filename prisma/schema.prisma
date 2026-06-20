@@ -1,0 +1,166 @@
+// prisma/schema.prisma
+// Copilote CRM intelligent — modèle de données SQLite
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// --- Référence des valeurs métier utilisées en string (SQLite ne supporte pas les enums natifs) ---
+// Segment        : Premium | Standard | Entreprise
+// StatutClient   : Actif | Inactif | Suspendu
+// Categorie      : Facturation | Livraison | Reclamation | Support Technique | Compte Utilisateur | Paiement | Information
+// Urgence        : Faible | Moyenne | Elevee | Critique
+// Sentiment      : Positif | Neutre | Negatif
+// StatutTicket   : Ouvert | En cours | Resolu | Ferme
+// Canal          : Email | Chat | Telephone | Reseaux sociaux
+// TypeInteraction: Entrant | Sortant
+// Confiance      : Haute | Moyenne | Basse
+// StatutValidation: En attente | Valide | Rejete | Modifie
+
+model Client {
+  id              Int      @id @default(autoincrement())
+  nom             String
+  prenom          String
+  email           String   @unique
+  telephone       String?
+  dateInscription DateTime @default(now())
+  segment         String   @default("Standard")
+  statut          String   @default("Actif")
+
+  tickets      Ticket[]
+  interactions Interaction[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("clients")
+}
+
+model Ticket {
+  id          Int      @id @default(autoincrement())
+  description String
+
+  // Déclaré par le client à la création (optionnel, avant analyse IA)
+  categorieDeclaree String?
+  priorite          String  @default("Moyenne")
+  statut            String  @default("Ouvert")
+
+  clientId Int
+  client   Client @relation(fields: [clientId], references: [id], onDelete: Cascade)
+
+  agentId Int?
+  agent   Agent? @relation(fields: [agentId], references: [id])
+
+  departementId Int?
+  departement   Departement? @relation(fields: [departementId], references: [id])
+
+  analyse AnalyseTicket?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("tickets")
+}
+
+model Interaction {
+  id              Int      @id @default(autoincrement())
+  canal           String
+  typeInteraction String
+  dateInteraction DateTime @default(now())
+  resume          String
+
+  clientId Int
+  client   Client @relation(fields: [clientId], references: [id], onDelete: Cascade)
+
+  agentId Int?
+  agent   Agent? @relation(fields: [agentId], references: [id])
+
+  createdAt DateTime @default(now())
+
+  @@map("interactions")
+}
+
+model Produit {
+  id         Int     @id @default(autoincrement())
+  nomProduit String
+  categorie  String
+  version    String?
+  prix       Float
+
+  @@map("produits")
+}
+
+model Agent {
+  id            Int     @id @default(autoincrement())
+  nom           String
+  prenom        String
+  competences   String?
+  disponibilite Boolean @default(true)
+
+  departementId Int?
+  departement   Departement? @relation(fields: [departementId], references: [id])
+
+  tickets      Ticket[]
+  interactions Interaction[]
+
+  @@map("agents")
+}
+
+model Departement {
+  id             Int     @id @default(autoincrement())
+  nomDepartement String  @unique
+  description    String?
+
+  agents  Agent[]
+  tickets Ticket[]
+
+  @@map("departements")
+}
+
+// --- Résultat du pipeline IA, persisté pour chaque ticket analysé ---
+model AnalyseTicket {
+  id Int @id @default(autoincrement())
+
+  ticketId Int    @unique
+  ticket   Ticket @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+
+  // Étape 1 : Classification
+  categorie             String
+  sousCategorie         String?
+  themePrincipal         String?
+  sentiment              String
+  scoreSentiment          Float?
+  justificationSentiment  String?
+  urgence                 String
+  scoreUrgence             Float?
+  justificationUrgence     String?
+
+  // Étape 2 : Routage
+  departementRecommande String?
+  agentRecommande        String?
+  raisonRoutage           String?
+
+  // Étape 3 : Résumé client
+  resumeClient String?
+
+  // Étape 4 : Réponse proposée
+  reponseProposee String?
+
+  // Étape 5 : Action recommandée (composante agentique)
+  actionRecommandee   String?
+  actionParametres    String? // JSON sérialisé en texte (SQLite n'a pas de type JSON natif)
+  confiance           String
+  necessiteValidation Boolean @default(true)
+
+  statutValidation String @default("En attente")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("analyses_tickets")
+}
